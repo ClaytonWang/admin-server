@@ -19,7 +19,7 @@ module.exports = appInfo => {
   config.keys = appInfo.name + '_1607609908869_9400';
 
   // add your middleware config here
-  config.middleware = [ 'logHandler', 'errorHandler' ];
+  config.middleware = ['logHandler', 'errorHandler'];
 
   // add your user config here
   const userConfig = {
@@ -42,22 +42,22 @@ module.exports = appInfo => {
     csrf: {
       enable: false,
     },
-    domainWhiteList: [ '*' ],
+    domainWhiteList: ['*'],
   };
 
   /** mysql配置 */
   config.mysql = {
     client: {
       // host
-      host: 'adminDemodb',
+      host: 'jxray.moyebuy.com',
       // 端口号
       port: '3306',
       // 用户名
-      user: 'admin_demo_user',
+      user: 'root',
       // 密码
-      password: 'admin2020',
+      password: 'admin2023',
       // 数据库名
-      database: 'admin_demo',
+      database: 'admin',
     },
   };
 
@@ -65,8 +65,8 @@ module.exports = appInfo => {
   config.redis = {
     client: {
       port: 6379,
-      host: 'adminDemodb',
-      password: '2020redis!',
+      host: 'jxray.moyebuy.com',
+      password: '2023redis!',
       db: 0,
     },
   };
