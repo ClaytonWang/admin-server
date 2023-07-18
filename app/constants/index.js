@@ -38,6 +38,21 @@ const CONSTANTS = {
     STOP_SCHEDULS: 'stop_schedule',
     RUN_SCHEDULS: 'run_schedule',
   },
+  FILERPARAMS: {
+    strNumberEnd: '',
+    strResNumDesc: '',
+    strResNumberHlr: '',
+    iPrestoreFee: '',
+    iDepositMonth: '',
+    iMinimumFee: '',
+    iMiniFee: '',
+    strResId: '',
+    fuzzyBillId: '',
+    // 带数字4: "characterNum":"4"
+    // 不带数字4: "characterNum":"***"
+    characterNum: '',
+    isPreLock: '',
+  },
 };
 
 module.exports = CONSTANTS;
