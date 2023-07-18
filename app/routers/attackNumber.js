@@ -5,11 +5,11 @@
  */
 module.exports = app => {
   const { router, controller, config } = app;
-  const checkTokenHandler = app.middleware.checkTokenHandler();
+  // const checkTokenHandler = app.middleware.checkTokenHandler();
 
-  router.get(`${config.contextPath}/attack/my`, checkTokenHandler, controller.attackNumer.myPhoneNumbs);
+  router.get(`${config.contextPath}/attack/my`, controller.attackNumer.myPhoneNumbs);
 
-  router.get(`${config.contextPath}/attack/all`, checkTokenHandler, controller.attackNumer.queryAll);
+  router.get(`${config.contextPath}/attack/all`, controller.attackNumer.queryAll);
 
-  router.post(`${config.contextPath}/attack/auto`, checkTokenHandler, controller.attackNumer.autoAttackNumbs);
+  router.post(`${config.contextPath}/attack/auto`, controller.attackNumer.autoAttackNumbs);
 };

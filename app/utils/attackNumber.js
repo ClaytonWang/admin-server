@@ -46,12 +46,19 @@ class AttackNumber {
    */
   async curlHandler(params) {
     // 获取参数
-    return await this.app.curl(params.url, {
+    const rslt = await this.app.curl(params.url, {
       method: params.method,
       data: params.data,
       headers: params.headers,
       dataType: 'json',
     });
+    if (rslt && rslt.data) {
+      const { code, msg } = rslt.data;
+      if (code === '-1') {
+        throw new Error(msg);
+      }
+    }
+    return rslt;
   }
 
   /** *
@@ -114,18 +121,17 @@ class AttackNumber {
       },
     };
     const result = await this.curlHandler(params);
-    // const { url } = result.data;
-
-    // if (url && url.length > 0 && url.indexOf('JSESSIONID') !== -1) {
-    //   const jSessionId = url.split('&')[1];
-    //   this.jSessionId = jSessionId;
-    // }
-
+    const { url } = result.data;
     let sessionId = '';
-    if (result.status === 302) {
-      const cookie = result.headers['set-cookie'][0];
-      sessionId = cookie.split(';')[0];
+    if (url && url.length > 0 && url.indexOf('JSESSIONID') !== -1) {
+      sessionId = url.split('&')[1];
     }
+
+    // let sessionId = '';
+    // if (result.status === 302) {
+    //   const cookie = result.headers['set-cookie'][0];
+    //   sessionId = cookie.split(';')[0];
+    // }
 
     await this.jobHandlerLog.log('任务sendLocation，状态码：{0}', result.status);
     await this.jobHandlerLog.log('任务sendLocation，响应数据：{0}', JSON.stringify(result.data));
@@ -176,7 +182,9 @@ class AttackNumber {
     const params = {
       method: 'POST',
       url: 'http://211.136.111.153:8080/MOP_ac/PadcrmSocialOpenAccountService?action=attackNumber',
-      data: `checkednumber=${pNumber}`,
+      data: {
+        checkednumber: pNumber,
+      },
       headers: {
         Pragma: 'no - cache',
         'Cache-Control': 'no-cache',
@@ -185,14 +193,13 @@ class AttackNumber {
         channel: 'APP4A',
         'User-Agent': 'Mozilla/5.0 (Linux; Android 13; V2271A Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/101.0.4951.74 Mobile Safari/537.36/shyd4a/shydyy/',
         ssoToken: this.ssoToken,
+        Cookie: `${sessionId}`,
         'Content-Type': 'application/x-www-form-urlencoded',
         Origin: 'http://211.136.111.153:8080',
         'X-Requested-With': ' com.sh.cm.grid4a',
         Referer: 'http://211.136.111.153:8080/MOP_ac/newMenu/padcrm/',
         'Accept-Encoding': 'gzip, deflate',
         'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
-        Cookie: `${sessionId}`,
-        Connection: 'keep-alive',
       },
     };
     const result = await this.curlHandler(params);
@@ -206,7 +213,10 @@ class AttackNumber {
     const params = {
       method: 'POST',
       url: 'http://211.136.111.153:8080/MOP_ac/socialOpenAccount.do?action=isOptNumber',
-      data: `type=4A&photoNumber=${pNumber}`,
+      data: {
+        type: '4A',
+        photoNumber: pNumber,
+      },
       headers: {
         Pragma: 'no-cache',
         'Cache-Control': 'no-cache',
@@ -273,16 +283,20 @@ class AttackNumber {
     }
 
     const prettyNums = [];
+    const logs = [];
 
-    for (const phone of numbers) {
+    for (const item of numbers) {
       for (const rule in this.rulesObj) {
         const reg = this.rulesObj[rule];
+        const phone = item.res_id;
+        // if (phone.substring(phone.length - (rule.length === 3 ? 4 : rule.length)).match(reg) != null && !prettyNums.includes(phone)) {
         if (phone.match(reg) != null && !prettyNums.includes(phone)) {
           prettyNums.push(phone);
+          logs.push(phone + '|' + rule);
         }
       }
     }
-
+    this.app.logger.info('【选中的号】：%s', JSON.stringify(logs));
     return prettyNums;
   }
 }
