@@ -24,7 +24,7 @@ class AttackNumberService extends Service {
     }
 
     this.app.logger.info('【JSESSIONID】：%s', sessionId);
-    this.app.logger.info('【Jtoken】：%s', token);
+    this.app.logger.info('【token】：%s', token);
 
     // 准备页面接口
     await aNumb.perpareAttackNumber(sessionId);
@@ -35,7 +35,9 @@ class AttackNumberService extends Service {
   }
 
   async autoAttack({ token, force = false }) {
+
     const aNumb = new AttackNumber(this.app, token);
+    const lockedNumb = [];
 
     try {
       // 按条件拿号码
@@ -54,10 +56,17 @@ class AttackNumberService extends Service {
 
       // 锁号
       for (const no of prettyNo) {
-        await aNumb.attackNumber(sessionId, no);
-        // 锁号完,调页面接口
-        await aNumb.afterAttackNum(sessionId, no);
+        try {
+          await aNumb.attackNumber(sessionId, no);
+          lockedNumb.push(no);
+          // 锁号完,调页面接口
+          await aNumb.afterAttackNum(sessionId, no);
+        } catch (error) {
+          this.app.logger.info('【锁号失败】：%s', no);
+          this.app.logger.info('【锁号信息】：%s', error);
+        }
       }
+      return lockedNumb;
     } catch (error) {
       throw new GlobalError(RESULT_FAIL, error.message);
     }
