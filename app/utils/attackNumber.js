@@ -67,18 +67,19 @@ class AttackNumber {
   async getPage() {
     const params = {
       method: 'GET',
+      // url: 'http://localhost:61919/MOP_ac/PadcrmOpenService',
       url: 'http://211.136.111.153:8080/MOP_ac/PadcrmOpenService',
       data: {
         action: 'getPage',
         menuId: '60021183',
         channel: 'APP4A',
-        ssoToken: 'L2dITy9zRVJ6dG1zVG85QTlvR1Z1TzVyUkJLbUx6SmRBWElNdGxwK1F4TzE3V29m',
+        ssoToken: this.ssoToken,
       },
       headers: {
         Pragma: 'no-cache',
         'Cache-Control': 'no-cache',
         'Upgrade-Insecure-Requests': 1,
-        'User-Agent': encodeURIComponent('Mozilla/5.0 (Linux; Android 13; V2271A Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/101.0.4951.74 Mobile Safari/537.36/shyd4a/shydyy/'),
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 13; V2271A Build/TP1A.220624.014; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/101.0.4951.74 Mobile Safari/537.36/shyd4a/shydyy/',
         Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
         'X-Requested-With': 'com.sh.cm.grid4a',
         'Accept-Encoding': 'gzip, deflate',
@@ -86,18 +87,27 @@ class AttackNumber {
       },
     };
     const result = await this.curlHandler(params);
+    let sessionId = '';
+    if (result.status === 302) {
+      const cookie = result.headers['set-cookie'][0];
+      sessionId = cookie.split(';')[0];
+    }
     await this.jobHandlerLog.log('任务getPage，状态码：{0}', result.status);
-    await this.jobHandlerLog.log('任务getPage，响应数据：{0}', JSON.stringify(result.data));
+    await this.jobHandlerLog.log('任务getPage，响应数据：{0}', JSON.stringify(result));
     await this.jobHandlerLog.log('任务getPage，请求数据：{0}', JSON.stringify(params));
+    return sessionId;
   }
 
   /**
    * 登录成功后第二次请求,用来发送当前app所再的位置,非上海的位置不允许使用
    * 返回ssoToken,JSESSIONID
    */
-  async sendLocation() {
+  async sendLocation(sessionId) {
+    const location = JSON.stringify({ address: '上海市嘉定区交运路464号靠近融侨星誉', city: '上海市', district: '嘉定区', exeResult: 1, lat: 31.296245, lng: 121.195396, locationType: 'GD', province: '上海市', street: '交运路', streetNumber: '464号' });
+    const device = JSON.stringify({ device: { appVersion: '1.9.4.3', availMemory: '4.15 GB', brand: 'vivo', c_id: '948fdb4b05639667', density: 3, model: 'V2271A', os: 'android', osVersion: 33, totalMemory: '7.81 GB' } });
     const params = {
       method: 'GET',
+      // url: 'http://localhost:61919/MOP_ac/PadcrmOpenService',
       url: 'http://211.136.111.153:8080/MOP_ac/PadcrmOpenService',
       data: {
         action: 'getPage',
@@ -106,8 +116,8 @@ class AttackNumber {
         ssoToken: this.ssoToken,
         customCode: '',
         callback: '',
-        device: JSON.stringify({ device: { appVersion: '1.9.4.3', availMemory: '4.15 GB', brand: 'vivo', c_id: '948fdb4b05639667', density: 3, model: 'V2271A', os: 'android', osVersion: 33, totalMemory: '7.81 GB' } }),
-        location: JSON.stringify({ address: '上海市嘉定区交运路464号', city: '上海市', district: '嘉定区', exeResult: 1, lat: 31.296245, lng: 121.195396, locationType: 'GD', province: '上海市', street: '交运路', streetNumber: '464号' }),
+        device,
+        location,
       },
       headers: {
         Pragma: 'no-cache',
@@ -118,20 +128,14 @@ class AttackNumber {
         Referer: 'http://211.136.111.153:8080/MOP_ac/page-sh/other/',
         'Accept-Encoding': 'gzip, deflate',
         'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+        Cookie: `${sessionId}`,
       },
     };
     const result = await this.curlHandler(params);
     const { url } = result.data;
-    let sessionId = '';
     if (url && url.length > 0 && url.indexOf('JSESSIONID') !== -1) {
       sessionId = url.split('&')[1];
     }
-
-    // let sessionId = '';
-    // if (result.status === 302) {
-    //   const cookie = result.headers['set-cookie'][0];
-    //   sessionId = cookie.split(';')[0];
-    // }
 
     await this.jobHandlerLog.log('任务sendLocation，状态码：{0}', result.status);
     await this.jobHandlerLog.log('任务sendLocation，响应数据：{0}', JSON.stringify(result.data));

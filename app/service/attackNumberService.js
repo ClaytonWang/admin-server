@@ -13,11 +13,18 @@ class AttackNumberService extends Service {
 
     // 第一次或1小时后重新认证一下
     if (!sessionId || force) {
+      // 第一次302跳转页面
+      sessionId = await aNumb.getPage();
+
       // 超时,自动 重新拿JSESSIONID
-      sessionId = await aNumb.sendLocation();
+      sessionId = await aNumb.sendLocation(sessionId);
+
       // 保存缓存
       await this.app.redis.set(ADMIN_PREFIX + token, sessionId, 'Ex', JSESSION_EXPIRE_TIME);
     }
+
+    this.app.logger.info('【JSESSIONID】：%s', sessionId);
+    this.app.logger.info('【Jtoken】：%s', token);
 
     // 准备页面接口
     await aNumb.perpareAttackNumber(sessionId);

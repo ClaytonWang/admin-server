@@ -9,7 +9,7 @@ const REDIS = {
   SCHEDULE_STACKS: 'schedule_stacks:',
 
   // JSESSION有效期
-  JSESSION_EXPIRE_TIME: 1800,
+  JSESSION_EXPIRE_TIME: 600,
 };
 
 module.exports = REDIS;
