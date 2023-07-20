@@ -1,6 +1,7 @@
 'use strict';
 
 const { Service } = require('egg');
+const { RESULT_SUCC } = require('./../constants/result');
 
 class ScheduleService extends Service {
   /**
@@ -43,9 +44,27 @@ class ScheduleService extends Service {
       data: paramsObj.data,
       dataType: 'json',
       headers: paramsObj.headers,
+      timeout: [5000, 50000],
     });
-    await jobHandlerLog.log('调用接口任务，状态码：{0}', result.status);
-    await jobHandlerLog.log('调用接口任务，响应数据：{0}', JSON.stringify(result.data));
+
+    const { code, data } = result.data;
+
+    if (code === RESULT_SUCC) {
+      let msg = '';
+      if (data.length === 0) {
+        msg = '当前没有靓号';
+      }
+
+      if (data.length > 0) {
+        msg = JSON.stringify(data);
+      }
+
+      await jobHandlerLog.log('靓号查找：{0}', msg);
+    } else {
+      await jobHandlerLog.log('调用接口任务，状态码：{0}', result.status);
+      await jobHandlerLog.log('调用接口任务，响应数据：{0}', JSON.stringify(result.data));
+    }
+
   }
 }
 

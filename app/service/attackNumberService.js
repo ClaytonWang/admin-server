@@ -15,9 +15,11 @@ class AttackNumberService extends Service {
     if (!sessionId || force) {
       // 第一次302跳转页面
       sessionId = await aNumb.getPage();
+      this.app.logger.info('【第一次302跳转页面】：%s', '完成');
 
       // 超时,自动 重新拿JSESSIONID
       sessionId = await aNumb.sendLocation(sessionId);
+      this.app.logger.info('【第二次发送位置】：%s', '完成');
 
       // 保存缓存
       await this.app.redis.set(ADMIN_PREFIX + token, sessionId, 'Ex', JSESSION_EXPIRE_TIME);
@@ -28,9 +30,11 @@ class AttackNumberService extends Service {
 
     // 准备页面接口
     await aNumb.perpareAttackNumber(sessionId);
+    this.app.logger.info('【准备页面接口】：%s', '完成');
 
-    // 按条件拿号码
+    // 查号码
     const phoneNumbs = await aNumb.searchPhNum(sessionId, filerParams);
+    this.app.logger.info('【查号码】：%s', '完成');
     return { phoneNumbs, sessionId };
   }
 
@@ -50,19 +54,18 @@ class AttackNumberService extends Service {
       // 按规则,过滤出靓号
       const prettyNo = await aNumb.getSelectPhNumByRule(phoneNumbs.selectPool);
 
-
       // const prettyNo = ['18321578974'],
-      //   sessionId = 'JSESSIONID=967ec90198624822f59adf717668';
+      // sessionId = 'JSESSIONID=967ec90198624822f59adf717668';
 
       // 锁号
-      for (const no of prettyNo) {
+      for (const item of prettyNo) {
         try {
-          await aNumb.attackNumber(sessionId, no);
-          lockedNumb.push(no);
+          await aNumb.attackNumber(sessionId, item.phone);
+          lockedNumb.push(item.phone + '|' + item.rule);
           // 锁号完,调页面接口
-          await aNumb.afterAttackNum(sessionId, no);
+          await aNumb.afterAttackNum(sessionId, item.phone);
         } catch (error) {
-          this.app.logger.info('【锁号失败】：%s', no);
+          this.app.logger.info('【锁号失败】：%s', item.phone);
           this.app.logger.info('【锁号信息】：%s', error);
         }
       }

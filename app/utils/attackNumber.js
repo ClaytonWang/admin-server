@@ -1,6 +1,6 @@
 'use strict';
 
-const JobHandlerLog = require('./JobHandlerLog');
+// const JobHandlerLog = require('./JobHandlerLog');
 const GlobalError = require('./GlobalError');
 const { RESULT_FAIL } = require('../constants/result');
 
@@ -8,7 +8,7 @@ class AttackNumber {
   constructor(app, ssoToken) {
     this.app = app;
     this.ctx = app.context;
-    this.jobHandlerLog = new JobHandlerLog(this.app);
+    // this.jobHandlerLog = new JobHandlerLog(this.app);
     this.ssoToken = ssoToken;
     this.rulesObj = {
       ABC: new RegExp(
@@ -50,7 +50,8 @@ class AttackNumber {
       method: params.method,
       data: params.data,
       headers: params.headers,
-      dataType: 'json',
+      dataType: params.dataType ? params.dataType : 'json',
+      timeout: params.timeout ? params.timeout : [5000, 50000],
     });
     if (rslt && rslt.data) {
       const { code, msg } = rslt.data;
@@ -67,7 +68,6 @@ class AttackNumber {
   async getPage() {
     const params = {
       method: 'GET',
-      // url: 'http://localhost:61919/MOP_ac/PadcrmOpenService',
       url: 'http://211.136.111.153:8080/MOP_ac/PadcrmOpenService',
       data: {
         action: 'getPage',
@@ -92,22 +92,22 @@ class AttackNumber {
       const cookie = result.headers['set-cookie'][0];
       sessionId = cookie.split(';')[0];
     }
-    await this.jobHandlerLog.log('任务getPage，状态码：{0}', result.status);
-    await this.jobHandlerLog.log('任务getPage，响应数据：{0}', JSON.stringify(result));
-    await this.jobHandlerLog.log('任务getPage，请求数据：{0}', JSON.stringify(params));
+    // await this.jobHandlerLog.log('任务getPage，状态码：{0}', result.status);
+    // await this.jobHandlerLog.log('任务getPage，响应数据：{0}', JSON.stringify(result));
+    // await this.jobHandlerLog.log('任务getPage，请求数据：{0}', JSON.stringify(params));
     return sessionId;
   }
 
   /**
    * 登录成功后第二次请求,用来发送当前app所再的位置,非上海的位置不允许使用
    * 返回ssoToken,JSESSIONID
+   * @param {*} sessionId JSESSIONID
    */
   async sendLocation(sessionId) {
     const location = JSON.stringify({ address: '上海市嘉定区交运路464号靠近融侨星誉', city: '上海市', district: '嘉定区', exeResult: 1, lat: 31.296245, lng: 121.195396, locationType: 'GD', province: '上海市', street: '交运路', streetNumber: '464号' });
     const device = JSON.stringify({ device: { appVersion: '1.9.4.3', availMemory: '4.15 GB', brand: 'vivo', c_id: '948fdb4b05639667', density: 3, model: 'V2271A', os: 'android', osVersion: 33, totalMemory: '7.81 GB' } });
     const params = {
       method: 'GET',
-      // url: 'http://localhost:61919/MOP_ac/PadcrmOpenService',
       url: 'http://211.136.111.153:8080/MOP_ac/PadcrmOpenService',
       data: {
         action: 'getPage',
@@ -137,9 +137,9 @@ class AttackNumber {
       sessionId = url.split('&')[1];
     }
 
-    await this.jobHandlerLog.log('任务sendLocation，状态码：{0}', result.status);
-    await this.jobHandlerLog.log('任务sendLocation，响应数据：{0}', JSON.stringify(result.data));
-    await this.jobHandlerLog.log('任务sendLocation，请求数据：{0}', JSON.stringify(params));
+    // await this.jobHandlerLog.log('任务sendLocation，状态码：{0}', result.status);
+    // await this.jobHandlerLog.log('任务sendLocation，响应数据：{0}', JSON.stringify(result.data));
+    // await this.jobHandlerLog.log('任务sendLocation，请求数据：{0}', JSON.stringify(params));
     return sessionId;
   }
 
@@ -168,9 +168,9 @@ class AttackNumber {
       },
     };
     const result = await this.curlHandler(params);
-    await this.jobHandlerLog.log('任务perpareAttackNumber，状态码：{0}', result.status);
-    await this.jobHandlerLog.log('任务perpareAttackNumber，响应数据：{0}', JSON.stringify(result.data));
-    await this.jobHandlerLog.log('任务perpareAttackNumber，请求数据：{0}', JSON.stringify(params));
+    // await this.jobHandlerLog.log('任务perpareAttackNumber，状态码：{0}', result.status);
+    // await this.jobHandlerLog.log('任务perpareAttackNumber，响应数据：{0}', JSON.stringify(result.data));
+    // await this.jobHandlerLog.log('任务perpareAttackNumber，请求数据：{0}', JSON.stringify(params));
     return result;
   }
 
@@ -207,9 +207,9 @@ class AttackNumber {
       },
     };
     const result = await this.curlHandler(params);
-    await this.jobHandlerLog.log('任务attackNumber，状态码：{0}', result.status);
-    await this.jobHandlerLog.log('任务attackNumber，响应数据：{0}', JSON.stringify(result.data));
-    await this.jobHandlerLog.log('任务attackNumber，请求数据：{0}', JSON.stringify(params));
+    // await this.jobHandlerLog.log('任务attackNumber，状态码：{0}', result.status);
+    // await this.jobHandlerLog.log('任务attackNumber，响应数据：{0}', JSON.stringify(result.data));
+    // await this.jobHandlerLog.log('任务attackNumber，请求数据：{0}', JSON.stringify(params));
     return result;
   }
 
@@ -240,9 +240,10 @@ class AttackNumber {
       },
     };
     const result = await this.curlHandler(params);
-    await this.jobHandlerLog.log('任务afterAttackNum，状态码：{0}', result.status);
-    await this.jobHandlerLog.log('任务afterAttackNum，响应数据：{0}', JSON.stringify(result.data));
-    await this.jobHandlerLog.log('任务afterAttackNum，请求数据：{0}', JSON.stringify(params));
+    // await this.jobHandlerLog.log('任务afterAttackNum，状态码：{0}', result.status);
+    // await this.jobHandlerLog.log('任务afterAttackNum，响应数据：{0}', JSON.stringify(result.data));
+    // await this.jobHandlerLog.log('任务afterAttackNum，请求数据：{0}', JSON.stringify(params));
+    return result;
   }
 
   // 查号码
@@ -256,6 +257,9 @@ class AttackNumber {
       method: 'POST',
       url: 'http://211.136.111.153:8080/MOP_ac/PadcrmSocialOpenAccountService?action=queryNumber',
       data: { ...filerParams },
+      // 创建连接超时 5 秒，接收响应超时 30 秒，用于响应比较大的场景
+      timeout: [5000, 50000],
+      // dataType: 'text',
       headers: {
         Accept: 'application/json, text/plain, */*',
         channel: 'APP4A',
@@ -272,9 +276,9 @@ class AttackNumber {
       },
     };
     const result = await this.curlHandler(params);
-    await this.jobHandlerLog.log('任务searchPhNum，状态码：{0}', result.status);
-    await this.jobHandlerLog.log('任务searchPhNum，响应数据：{0}', JSON.stringify(result.data));
-    await this.jobHandlerLog.log('任务searchPhNum，请求数据：{0}', JSON.stringify(params));
+    // await this.jobHandlerLog.log('任务searchPhNum，状态码：{0}', result.status);
+    // await this.jobHandlerLog.log('任务searchPhNum，响应数据：{0}', JSON.stringify(result.data));
+    // await this.jobHandlerLog.log('任务searchPhNum，请求数据：{0}', JSON.stringify(params));
     return result.data;
   }
 
@@ -295,12 +299,12 @@ class AttackNumber {
         const phone = item.res_id;
         // if (phone.substring(phone.length - (rule.length === 3 ? 4 : rule.length)).match(reg) != null && !prettyNums.includes(phone)) {
         if (phone.match(reg) != null && !prettyNums.includes(phone)) {
-          prettyNums.push(phone);
+          prettyNums.push({ phone, rule });
           logs.push(phone + '|' + rule);
         }
       }
     }
-    this.app.logger.info('【选中的号】：%s', JSON.stringify(logs));
+    this.app.logger.info('【选中的号】：%s', logs.length === 0 ? '当前没有靓号' : logs);
     return prettyNums;
   }
 }

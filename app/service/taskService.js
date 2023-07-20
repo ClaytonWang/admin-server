@@ -14,10 +14,10 @@ class TaskService extends Service {
     const limit = parseInt(size),
       offset = parseInt(page - 1) * parseInt(size);
 
-    const [ list, total ] = await Promise.all([
+    const [list, total] = await Promise.all([
       this.app.mysql.select('schedule_job', {
         where: { is_delete: SCHEDULE_DELETE.MANUAL },
-        orders: [[ 'create_time', 'desc' ]],
+        orders: [['job_id', 'asc']],
         limit,
         offset,
       }),
@@ -110,11 +110,11 @@ class TaskService extends Service {
     const limit = parseInt(size),
       offset = parseInt(page - 1) * parseInt(size);
 
-    const [ list, total ] = await Promise.all([
+    const [list, total] = await Promise.all([
       this.app.mysql.query(`SELECT job.jobName jobName, log.id id, log.job_handler jobHandler, log.job_param jobParam, log.handle_time handleTime,
       log.job_status jobStatus, log.trigger_type triggerType, log.execution_status executionStatus, log.error_log errorLog FROM schedule_job job,
-      schedule_job_log log WHERE job.job_id = log.job_id AND log.job_id = ? ORDER BY log.create_time DESC LIMIT ?,?`, [ job_id, offset, limit]),
-      this.app.mysql.count('schedule_job_log', { job_id })
+      schedule_job_log log WHERE job.job_id = log.job_id AND log.job_id = ? ORDER BY log.create_time DESC LIMIT ?,?`, [job_id, offset, limit]),
+      this.app.mysql.count('schedule_job_log', { job_id }),
     ]);
 
     return { list, total };

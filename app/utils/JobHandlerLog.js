@@ -1,7 +1,7 @@
 'use strict';
 
 const { SCHEDULE_EXECUTION_STATUS, SCHEDULE_TRIGGER_TYPE } = require('../constants');
-const { formatStr } = require('./index')
+const { formatStr } = require('./index');
 
 class JobHandlerLog {
   constructor(app) {
@@ -17,7 +17,7 @@ class JobHandlerLog {
       job_param: schedule.params,
       trigger_type: triggerType,
       error_log: '',
-      job_log: `任务触发类型：${triggerType === SCHEDULE_TRIGGER_TYPE.TASK ? 'Cron触发' : '手动触发'}<br>`,
+      job_log: `任务触发类型：${triggerType === SCHEDULE_TRIGGER_TYPE.TASK ? '定时自动触发' : '手动触发'}<br>`,
     });
     this.id = result.insertId;
   }
@@ -25,13 +25,13 @@ class JobHandlerLog {
   // 追加日志
   async log(logStr, ...args) {
     const content = formatStr(logStr, ...args);
-    await this.app.mysql.query('UPDATE schedule_job_log SET job_log = CONCAT(job_log, ?) WHERE id = ?', [ `${content}<br/>`, this.id ]);
+    await this.app.mysql.query('UPDATE schedule_job_log SET job_log = CONCAT(job_log, ?) WHERE id = ?', [`${content}<br/>`, this.id]);
   }
 
   // 记录执行异常日志
   async error(logStr, ...args) {
     const errorMsg = formatStr(logStr, ...args);
-    await this.app.mysql.query('UPDATE schedule_job_log SET job_status = -1, error_log = ? WHERE id = ?', [ errorMsg, this.id ]);
+    await this.app.mysql.query('UPDATE schedule_job_log SET job_status = -1, error_log = ? WHERE id = ?', [errorMsg, this.id]);
   }
 
   // 定时任务执行结束
