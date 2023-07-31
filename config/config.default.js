@@ -45,6 +45,11 @@ module.exports = appInfo => {
     domainWhiteList: ['*'],
   };
 
+  config.cors = {
+    origin: '*',
+    allowMethods: 'GET,HEAD,PUT,OPTIONS,POST,DELETE,PATCH',
+  };
+
   /** mysql配置 */
   config.mysql = {
     client: {

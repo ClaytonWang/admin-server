@@ -10,13 +10,31 @@ class AttackNumerController extends Controller {
     ctx.body = setResult({ data: result });
   }
 
+  async myStoreNums() {
+    const { ctx } = this;
+    const result = await ctx.service.attackNumberService.queryStoreNums(ctx.request.query);
+    ctx.body = setResult({ data: result });
+  }
+
   async autoAttackNumbs() {
     const { ctx } = this;
-    const result = await ctx.service.attackNumberService.autoAttack(ctx.request.query);
+    const result = await ctx.service.attackNumberService.autoAttack(ctx.request.body);
     ctx.body = setResult({ data: result });
   }
 
   async queryAll() {
+    const { ctx } = this;
+    const result = await ctx.service.attackNumberService.queryAll(ctx.request.query);
+    ctx.body = setResult({ data: result });
+  }
+
+  async order() {
+    const { ctx } = this;
+    const result = await ctx.service.attackNumberService.order(ctx.request.body);
+    ctx.body = setResult({ data: result });
+  }
+
+  async search() {
     const { ctx } = this;
     const result = await ctx.service.attackNumberService.queryAll(ctx.request.query);
     ctx.body = setResult({ data: result });

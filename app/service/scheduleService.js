@@ -59,7 +59,7 @@ class ScheduleService extends Service {
         msg = JSON.stringify(data);
       }
 
-      await jobHandlerLog.log('靓号查找：{0}', msg);
+      await jobHandlerLog.log('靓号：{0}', msg);
     } else {
       await jobHandlerLog.log('调用接口任务，状态码：{0}', result.status);
       await jobHandlerLog.log('调用接口任务，响应数据：{0}', JSON.stringify(result.data));

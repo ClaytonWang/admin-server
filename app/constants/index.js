@@ -50,7 +50,7 @@ const CONSTANTS = {
     fuzzyBillId: '',
     // 带数字4: "characterNum":"4"
     // 不带数字4: "characterNum":"***"
-    characterNum: '',
+    characterNum: '***',
     isPreLock: '',
   },
 };

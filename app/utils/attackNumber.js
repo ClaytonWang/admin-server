@@ -5,16 +5,19 @@ const GlobalError = require('./GlobalError');
 const { RESULT_FAIL } = require('../constants/result');
 
 class AttackNumber {
-  constructor(app, ssoToken) {
+  constructor(app, ssoToken, rule = null) {
     this.app = app;
     this.ctx = app.context;
     // this.jobHandlerLog = new JobHandlerLog(this.app);
     this.ssoToken = ssoToken;
-    this.rulesObj = {
-      ABC: new RegExp(
-        '(?:0(?=1)|1(?=2)|2(?=3)|3(?=4)|4(?=5)|5(?=6)|6(?=7)|7(?=8)|8(?=9)){2}\\d',
-        'g'
-      ),
+    const ruleObj = {
+      AABB: new RegExp(/^[0-9]{7}(\d)\1((?!\1)\d)\2$/, 'g'),
+      XAAA: new RegExp(/^[0-9]{8}(\d)\1{2}$/, 'g'),
+      AAAB: new RegExp(/^[0-9]{7}(\d)\1{2}((?!\1)\d)$/, 'g'),
+      ABAB: new RegExp(/^[0-9]{7}(\d)((?!\1)\d)\1\2$/, 'g'),
+      // AABA: new RegExp(/^[0-9]{7}(\d)\1((?!\1)\d)\1$/, 'g'),
+      // ABAA: new RegExp(/^[0-9]{7}(\d)((?!\1)\d)\1{2}$/, 'g'),
+      // ABBA: new RegExp(/^[0-9]{7}(\d)((?!\1)\d)\2\1$/, 'g'),
       ABCD: new RegExp(
         '(?:0(?=1)|1(?=2)|2(?=3)|3(?=4)|4(?=5)|5(?=6)|6(?=7)|7(?=8)|8(?=9)){3}\\d',
         'g'
@@ -23,21 +26,16 @@ class AttackNumber {
         '(?:0(?=1)|1(?=2)|2(?=3)|3(?=4)|4(?=5)|5(?=6)|6(?=7)|7(?=8)|8(?=9)){4}\\d',
         'g'
       ),
-      ABCABC: new RegExp(
-        '(?:0(?=1)|1(?=2)|2(?=3)|3(?=4)|4(?=5)|5(?=6)|6(?=7)|7(?=8)|8(?=9)){2}\\d{4}',
-        'g'
-      ),
-      AAAAAA: new RegExp('([\\d])\\1{5,}', 'g'),
-      AAAAA: new RegExp('([\\d])\\1{4,}', 'g'),
-      AAAA: new RegExp('(.)\\1{3}', 'g'),
-      AAA: new RegExp('(.)\\1{2}', 'g'),
-      AAAAAB: new RegExp('(\\d)\\1\\1\\1\\1((?!\\1)\\d)', 'g'),
-      AAAAB: new RegExp('(\\d)\\1\\1\\1((?!\\1)\\d)', 'g'),
-      AAAB: new RegExp('(\\d)\\1\\1((?!\\1)\\d)', 'g'),
-      AAABB: new RegExp('(\\d)\\1\\1((?!\\1)\\d)\\2', 'g'),
-      ABAB: new RegExp('(\\d)((?!\\1)\\d)\\1\\2', 'g'),
-      AABBCC: new RegExp('(\\d)\\1((?!\\1)\\d)\\2((?!\\1)\\d)\\3', 'g'),
     };
+
+    if (rule && ruleObj[rule]) {
+      const obj = {};
+      obj[rule] = ruleObj[rule];
+      this.rulesObj = obj;
+    } else {
+      this.rulesObj = null;
+    }
+
   }
 
   /**
@@ -104,7 +102,7 @@ class AttackNumber {
    * @param {*} sessionId JSESSIONID
    */
   async sendLocation(sessionId) {
-    const location = JSON.stringify({ address: '上海市嘉定区交运路464号靠近融侨星誉', city: '上海市', district: '嘉定区', exeResult: 1, lat: 31.296245, lng: 121.195396, locationType: 'GD', province: '上海市', street: '交运路', streetNumber: '464号' });
+    const location = JSON.stringify({ address: '上海市嘉定区交运路464号', city: '上海市', district: '嘉定区', exeResult: 1, lat: 31.296245, lng: 121.195396, locationType: 'GD', province: '上海市', street: '交运路', streetNumber: '464号' });
     const device = JSON.stringify({ device: { appVersion: '1.9.4.3', availMemory: '4.15 GB', brand: 'vivo', c_id: '948fdb4b05639667', density: 3, model: 'V2271A', os: 'android', osVersion: 33, totalMemory: '7.81 GB' } });
     const params = {
       method: 'GET',
@@ -282,6 +280,86 @@ class AttackNumber {
     return result.data;
   }
 
+  getBeautifulPhone(phoneNum) {
+    // 正则规则
+    const regexArrs = [
+      {
+        regex: /(123|234|345|456|567|678|789|987|876|765|654|543|432|321){2}/,
+        type: '双顺子',
+      },
+      {
+        regex: /(\d)\1{2,}/,
+        type: 'AAA',
+      },
+      {
+        regex: /(\d{3,4})\1/,
+        type: 'ABCDABCD',
+      },
+      {
+        regex: /12345|23456|34567|45678|56789|98765|87654|76543|65342|54321|78910/,
+        type: '事业靓号',
+      },
+      {
+        regex: /(\d)\1(\d)\2/,
+        type: 'AABB',
+      },
+      {
+        regex: /(\d)(\d)\1\2/,
+        type: 'ABAB',
+      },
+      {
+        regex: /1234|2345|3456|4567|5678|6789|9876|8765|7654|6543|5432|4321/,
+        type: '发达靓号',
+      },
+      {
+        regex: /123|234|345|456|567|678|789|987|876|756|645|534|432|321/,
+        type: '发达靓号',
+      },
+      {
+        regex: /1314|520|521/,
+        type: '天长地久',
+      },
+      {
+        regex: /(?:168|369|68|69|89|96)$/,
+        type: '发达靓号',
+      },
+      {
+        regex: /(\d).*?\1.*?\1.*?\1.*?\1/,
+        type: '发达靓号',
+        replacer: (e, t) => {
+          return e.split('').map(e => {
+            return e === t[1] ? 1 : 0;
+          }).join('');
+        },
+      },
+    ];
+    phoneNum = String(phoneNum);
+    let phoneColors = '00000000000';
+    let phoneType = '';
+    for (let index = 0; index < regexArrs.length; index++) {
+      const item = regexArrs[index];
+      const regex = item.regex;
+      const type = item.type;
+      const replacer = item.replacer;
+      const isMatched = phoneNum.match(regex);
+      if (isMatched) {
+        if (replacer) {
+          phoneColors = replacer(phoneNum, isMatched);
+        } else {
+          phoneColors = new Array(11).fill(0).map((num, i) => {
+            return isMatched.index <= i && i < isMatched.index + isMatched[0].length ? 1 : 0;
+          })
+            .join('');
+        }
+        phoneType = type;
+        break;
+      }
+    }
+    return { phoneNum, phoneColors, phoneType };
+  }
+  // this.phoneInfo = this.getBeautifulPhone(17688888280)
+  // {phoneNum: '17688888280', phoneColors: '00011111000', phoneType: '发达靓号'}
+
   async getSelectPhNumByRule(numbers) {
     if (!numbers) {
       throw new GlobalError(RESULT_FAIL, '搜索号码结果为空,请检查.');
@@ -291,20 +369,22 @@ class AttackNumber {
     }
 
     const prettyNums = [];
-    const logs = [];
-
     for (const item of numbers) {
-      for (const rule in this.rulesObj) {
-        const reg = this.rulesObj[rule];
-        const phone = item.res_id;
-        // if (phone.substring(phone.length - (rule.length === 3 ? 4 : rule.length)).match(reg) != null && !prettyNums.includes(phone)) {
-        if (phone.match(reg) != null && !prettyNums.includes(phone)) {
-          prettyNums.push({ phone, rule });
-          logs.push(phone + '|' + rule);
+      if (this.rulesObj) {
+        for (const rule in this.rulesObj) {
+          const reg = this.rulesObj[rule];
+          const phone = item.res_id;
+
+          if (phone.match(reg) != null && !prettyNums.includes(phone)) {
+            const price = 0;
+            prettyNums.push({ ...item, rule, id: item.res_id, title: item.res_id, desc: '', price });
+          }
         }
+      } else {
+        prettyNums.push({ ...item, rule: '', id: item.res_id, title: item.res_id, desc: '', price: 0 });
       }
+
     }
-    this.app.logger.info('【选中的号】：%s', logs.length === 0 ? '当前没有靓号' : logs);
     return prettyNums;
   }
 }
