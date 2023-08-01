@@ -1,5 +1,5 @@
 # 设置基础镜像,基于node:14.0.0版本
-FROM node:14.0.0
+FROM node:16.20-slim
 
 # 配置环境变量
 ENV NODE_ENV production

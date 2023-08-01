@@ -33,7 +33,23 @@ services:
      ports:
        - "6379:6379"
      volumes:
-       - /apps/redis/redis.conf:/etc/redis/redis.conf 
-       - /apps/redis/data:/data      
-     command: redis-server /etc/redis/redis.conf 
+       - /apps/redis/redis.conf:/etc/redis/redis.conf
+       - /apps/redis/data:/data
+     command: redis-server /etc/redis/redis.conf
      privileged: true
+  worker:
+    image: claydocker/xuanhaowang-worker:master
+    restart: always
+    container_name: worker
+    command: npm start
+    depends_on:
+      - mysql
+      - redis
+  server:
+    image: claydocker/xuanhaowang-server:master
+    restart: always
+    container_name: worker
+    command: npm start
+    depends_on:
+      - mysql
+      - redis
