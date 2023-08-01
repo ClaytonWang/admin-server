@@ -12,7 +12,7 @@ services:
   mysql:
     restart: always
     image: mysql:5.7.35
-    container_name: mysqldb
+    container_name: mysql
     volumes:
       - /apps/mysql/datadir:/var/lib/mysql
       - /apps/mysql/conf/my.cnf:/etc/mysql/my.cnf
@@ -53,14 +53,14 @@ services:
     depends_on:
       - mysql
       - redis
-  server-web:
-    image: claydocker/xuanlianghao-server-web:main
-    restart: always
-    container_name: server-web
-    command: npm start
-    depends_on:
-      - mysql
-      - redis
+  # server-web:
+  #   image: claydocker/xuanlianghao-server-web:main
+  #   restart: always
+  #   container_name: server-web
+  #   command: npm start
+  #   depends_on:
+  #     - mysql
+  #     - redis
   xuanlianghao:
     image: claydocker/xuanlianghao:main
     restart: always
