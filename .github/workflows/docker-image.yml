@@ -24,7 +24,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: claydocker/xuanhaowang-server
+          images: claydocker/xuanlianghao-server
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4

@@ -38,7 +38,7 @@ services:
      command: redis-server /etc/redis/redis.conf
      privileged: true
   worker:
-    image: claydocker/xuanhaowang-worker:master
+    image: claydocker/xuanlianghao-worker:master
     restart: always
     container_name: worker
     command: npm start
@@ -46,10 +46,25 @@ services:
       - mysql
       - redis
   server:
-    image: claydocker/xuanhaowang-server:master
+    image: claydocker/xuanlianghao-server:main
     restart: always
-    container_name: worker
+    container_name: server
     command: npm start
+    depends_on:
+      - mysql
+      - redis
+  server-web:
+    image: claydocker/xuanlianghao-server-web:main
+    restart: always
+    container_name: server-web
+    command: npm start
+    depends_on:
+      - mysql
+      - redis
+  xuanlianghao:
+    image: claydocker/xuanlianghao:main
+    restart: always
+    container_name: xuanlianghao
     depends_on:
       - mysql
       - redis
