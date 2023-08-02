@@ -37,4 +37,4 @@ COPY . /usr/src/app
 EXPOSE 7002
 
 # 启动项目
-CMD npm start
+CMD [ "npm", "start" ]
