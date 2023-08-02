@@ -76,8 +76,8 @@ services:
     restart: on-failure
     container_name: xuanlianghao
     environment:
-      - VIRTUAL_HOST=xuanlianghao.cn
-      - LETSENCRYPT_HOST=xuanlianghao.cn
+      - VIRTUAL_HOST=www.xuanlianghao.cn
+      - LETSENCRYPT_HOST=www.xuanlianghao.cn
       - LETSENCRYPT_EMAIL=lovejunlic@qq.com
     networks:
       - proxy
