@@ -71,7 +71,6 @@ services:
       - LETSENCRYPT_EMAIL=lovejunlic@qq.com
     networks:
       - proxy
-    command: npm start
     depends_on:
       - mysql
       - redis
