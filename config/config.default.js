@@ -54,7 +54,8 @@ module.exports = appInfo => {
   config.mysql = {
     client: {
       // host
-      host: 'jxray.moyebuy.com',
+      // host: 'jxray.moyebuy.com',
+      host: 'mysql',
       // 端口号
       port: '3306',
       // 用户名
@@ -70,7 +71,7 @@ module.exports = appInfo => {
   config.redis = {
     client: {
       port: 6379,
-      host: 'jxray.moyebuy.com',
+      host: 'redis',
       password: '2023redis!',
       db: 0,
     },

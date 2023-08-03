@@ -14,5 +14,31 @@ module.exports = () => {
       },
     };
   }
+
+  config.mysql = {
+    client: {
+      // host
+      // host: 'jxray.moyebuy.com',
+      host: 'www.xuanlianghao.cn',
+      // 端口号
+      port: '3306',
+      // 用户名
+      user: 'root',
+      // 密码
+      password: 'admin2023',
+      // 数据库名
+      database: 'admin',
+    },
+  };
+
+  config.redis = {
+    client: {
+      port: 6379,
+      host: 'jxray.moyebuy.com',
+      password: '2023redis!',
+      db: 0,
+    },
+  };
+
   return config;
 };
