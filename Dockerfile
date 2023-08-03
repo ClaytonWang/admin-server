@@ -1,6 +1,10 @@
 # 设置基础镜像,基于node:14.0.0版本
 FROM node:16.20-slim
 
+RUN apt-get update && apt-get install -y tzdata
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # 配置环境变量
 ENV NODE_ENV production
 

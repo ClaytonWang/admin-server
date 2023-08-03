@@ -61,16 +61,20 @@ services:
     depends_on:
       - mysql
       - redis
-  # server-web:
-  #   image: claydocker/xuanlianghao-server-web:main
-  #   restart: on-failure
-  #   container_name: server-web
-  # networks:
-  #           - proxy
-  #   command: npm start
-  #   depends_on:
-  #     - mysql
-  #     - redis
+  server-web:
+    image: claydocker/xuanlianghao-web:main
+    restart: on-failure
+    container_name: server-web
+    environment:
+      - VIRTUAL_HOST=admin.xuanlianghao.cn
+      - LETSENCRYPT_HOST=admin.xuanlianghao.cn
+      - LETSENCRYPT_EMAIL=lovejunlic@qq.com
+    networks:
+      - proxy
+    command: npm start
+    depends_on:
+      - mysql
+      - redis
   xuanlianghao:
     image: claydocker/xuanlianghao:main
     restart: on-failure
