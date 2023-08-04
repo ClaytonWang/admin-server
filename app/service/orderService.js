@@ -41,14 +41,13 @@ class OrderService extends Service {
     return { phoneNumbs, sessionId };
   }
 
-  async queryStoreNums(user) {
+  async queryStoreNums({ minute = 3100 }) {
     const sqlStr = `
     select DISTINCT * from number_detail
-    where create_by = 'dls_bszg00414'
-    AND create_time between DATE_ADD(date_format(now(),'%Y-%m-%d %H:%i:%s'),interval -30 MINUTE)
+    where update_time between DATE_ADD(date_format(now(),'%Y-%m-%d %H:%i:%s'),interval -${minute} MINUTE)
     AND date_format(now(),'%Y-%m-%d %H:%i:%s')`;
 
-    const list = await this.app.mysql.query(sqlStr, [user]);
+    const list = await this.app.mysql.query(sqlStr);
     return list;
   }
 
@@ -76,7 +75,7 @@ class OrderService extends Service {
   async order(lockedNum, user = 'custom', type = 'order') {
     const { id: res_id } = lockedNum;
     const sql = 'INSERT INTO number_detail(phone_num,busi_type,detail_json,create_by,update_by) VALUES (?, ?, ?, ?, ?);';
-    const addSqlParams = [res_id, type, JSON.stringify(lockedNum), user, user];
+    const addSqlParams = [ res_id, type, JSON.stringify(lockedNum), user, user ];
     return await this.app.mysql.query(sql, addSqlParams);
   }
 

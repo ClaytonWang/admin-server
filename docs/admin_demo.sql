@@ -186,10 +186,10 @@ CREATE TABLE `sys_role` (
 -- ----------------------------
 BEGIN;
 INSERT INTO `sys_role` VALUES (1, '超级管理员', '拥有系统所有权限', 'admin', 'admin', '2020-12-13 04:55:17', '2021-09-04 00:56:58');
-INSERT INTO `sys_role` VALUES (2, '运营', '运营角色', 'admin', 'admin', '2020-12-16 01:08:16', '2021-11-30 17:00:39');
-INSERT INTO `sys_role` VALUES (3, '业务员', '业务员', 'admin', 'admin', '2021-09-17 06:06:59', '2021-09-18 17:06:37');
-INSERT INTO `sys_role` VALUES (4, '1', '1', 'admin', 'admin', '2021-12-22 10:04:33', '2021-12-22 10:04:33');
-INSERT INTO `sys_role` VALUES (5, 'v', '方法', 'admin', 'admin', '2022-04-25 12:00:02', '2022-04-25 12:00:02');
+-- INSERT INTO `sys_role` VALUES (2, '运营', '运营角色', 'admin', 'admin', '2020-12-16 01:08:16', '2021-11-30 17:00:39');
+-- INSERT INTO `sys_role` VALUES (3, '业务员', '业务员', 'admin', 'admin', '2021-09-17 06:06:59', '2021-09-18 17:06:37');
+-- INSERT INTO `sys_role` VALUES (4, '1', '1', 'admin', 'admin', '2021-12-22 10:04:33', '2021-12-22 10:04:33');
+-- INSERT INTO `sys_role` VALUES (5, 'v', '方法', 'admin', 'admin', '2022-04-25 12:00:02', '2022-04-25 12:00:02');
 COMMIT;
 
 -- ----------------------------
