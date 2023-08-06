@@ -41,7 +41,7 @@ class OrderService extends Service {
     return { phoneNumbs, sessionId };
   }
 
-  async queryStoreNums({ minute = 3100 }) {
+  async queryStoreNums({ minute = 31 }) {
     const sqlStr = `
     select DISTINCT * from number_detail
     where update_time between DATE_ADD(date_format(now(),'%Y-%m-%d %H:%i:%s'),interval -${minute} MINUTE)
