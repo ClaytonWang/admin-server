@@ -41,7 +41,7 @@ class OrderService extends Service {
     return { phoneNumbs, sessionId };
   }
 
-  async queryStoreNums({ minute = 31 }) {
+  async queryStoreNums({ minute = 35 }) {
     const sqlStr = `
     select DISTINCT * from number_detail
     where is_delete=0
