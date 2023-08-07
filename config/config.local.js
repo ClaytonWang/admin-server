@@ -18,8 +18,8 @@ module.exports = () => {
   config.mysql = {
     client: {
       // host
-      host: 'jxray.moyebuy.com',
-      // host: 'www.xuanlianghao.cn',
+      // host: 'jxray.moyebuy.com',
+      host: 'www.xuanlianghao.cn',
       // 端口号
       port: '3306',
       // 用户名

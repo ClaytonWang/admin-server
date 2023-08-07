@@ -10,5 +10,7 @@ module.exports = app => {
 
   router.post(`${config.contextPath}/order/order`, controller.order.order);
 
+  router.post(`${config.contextPath}/order/delete`, controller.order.delete);
+
   router.get(`${config.contextPath}/order/search`, controller.order.search);
 };

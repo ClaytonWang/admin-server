@@ -44,7 +44,8 @@ class OrderService extends Service {
   async queryStoreNums({ minute = 31 }) {
     const sqlStr = `
     select DISTINCT * from number_detail
-    where update_time between DATE_ADD(date_format(now(),'%Y-%m-%d %H:%i:%s'),interval -${minute} MINUTE)
+    where is_delete=0
+    AND update_time between DATE_ADD(date_format(now(),'%Y-%m-%d %H:%i:%s'),interval -${minute} MINUTE)
     AND date_format(now(),'%Y-%m-%d %H:%i:%s')`;
 
     const list = await this.app.mysql.query(sqlStr);
@@ -76,6 +77,12 @@ class OrderService extends Service {
     const { id: res_id } = lockedNum;
     const sql = 'INSERT INTO number_detail(phone_num,busi_type,detail_json,create_by,update_by) VALUES (?, ?, ?, ?, ?);';
     const addSqlParams = [ res_id, type, JSON.stringify(lockedNum), user, user ];
+    return await this.app.mysql.query(sql, addSqlParams);
+  }
+
+  async delete({ num_id }) {
+    const sql = 'UPDATE number_detail SET is_delete=1,update_time=NOW() WHERE num_id=?';
+    const addSqlParams = [ num_id ];
     return await this.app.mysql.query(sql, addSqlParams);
   }
 
