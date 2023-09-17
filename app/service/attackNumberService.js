@@ -58,7 +58,7 @@ class AttackNumberService extends Service {
 
     try {
       // 按条件拿号码
-      const { phoneNumbs, sessionId } = await this.query(aNumb, {
+      const { phoneNumbs } = await this.query(aNumb, {
         isAuto: true,
         force,
         token, filerParams: {
@@ -120,7 +120,7 @@ class AttackNumberService extends Service {
     AND create_time between DATE_ADD(date_format(now(),'%Y-%m-%d %H:%i:%s'),interval -30 MINUTE)
     AND date_format(now(),'%Y-%m-%d %H:%i:%s')`;
 
-    const list = await this.app.mysql.query(sqlStr, [user]);
+    const list = await this.app.mysql.query(sqlStr, [ user ]);
     return list;
   }
 
@@ -141,7 +141,7 @@ class AttackNumberService extends Service {
   async order(lockedNum, user = 'custom', type = 'order') {
     const { id: res_id } = lockedNum;
     const sql = 'INSERT INTO number_detail(phone_num,busi_type,detail_json,create_by,update_by) VALUES (?, ?, ?, ?, ?);';
-    const addSqlParams = [res_id, type, JSON.stringify(lockedNum), user, user];
+    const addSqlParams = [ res_id, type, JSON.stringify(lockedNum), user, user ];
     return await this.app.mysql.query(sql, addSqlParams);
   }
 

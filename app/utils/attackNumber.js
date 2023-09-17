@@ -40,13 +40,13 @@ class AttackNumber {
 
   }
 
-  getData(data) {
+  getData(data, log) {
     let base = JSON.stringify(data);
     try {
       base = this.crypto.ecbencrypt(data);
       base = 'encode=' + base;
     } catch (e) {
-      console.log('Error:', e);
+      console.log('Error:', log);
     }
     return base;
   }
@@ -59,7 +59,7 @@ class AttackNumber {
     // 获取参数
     const rslt = await this.app.curl(params.url, {
       method: params.method,
-      data: params.method.toUpperCase() === 'POST' ? this.getData(params.data) : params.data,
+      data: params.method.toUpperCase() === 'POST' ? this.getData(params.data, params) : params.data,
       headers: params.headers,
       dataType: params.dataType ? params.dataType : 'json',
       timeout: params.timeout ? params.timeout : [ 5000, 50000 ],
