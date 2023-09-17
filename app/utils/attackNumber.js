@@ -3,6 +3,7 @@
 // const JobHandlerLog = require('./JobHandlerLog');
 const GlobalError = require('./GlobalError');
 const { RESULT_FAIL } = require('../constants/result');
+const crypto = require('./Cryp');
 
 class AttackNumber {
   constructor(app, ssoToken, rule = null) {
@@ -10,6 +11,7 @@ class AttackNumber {
     this.ctx = app.context;
     // this.jobHandlerLog = new JobHandlerLog(this.app);
     this.ssoToken = ssoToken;
+    this.crypto = crypto;
     const ruleObj = {
       AABB: new RegExp(/^[0-9]{7}(\d)\1((?!\1)\d)\2$/, 'g'),
       XAAA: new RegExp(/^[0-9]{8}(\d)\1{2}$/, 'g'),
@@ -38,6 +40,17 @@ class AttackNumber {
 
   }
 
+  getData(data) {
+    let base = JSON.stringify(data);
+    try {
+      base = this.crypto.ecbencrypt(data);
+      base = 'encode=' + base;
+    } catch (e) {
+      console.log('Error:', e);
+    }
+    return base;
+  }
+
   /**
    * 调用接口任务
    * @param {*} params 任务参数
@@ -46,17 +59,25 @@ class AttackNumber {
     // 获取参数
     const rslt = await this.app.curl(params.url, {
       method: params.method,
-      data: params.data,
+      data: params.method.toUpperCase() === 'POST' ? this.getData(params.data) : params.data,
       headers: params.headers,
       dataType: params.dataType ? params.dataType : 'json',
-      timeout: params.timeout ? params.timeout : [5000, 50000],
+      timeout: params.timeout ? params.timeout : [ 5000, 50000 ],
     });
     if (rslt && rslt.data) {
-      const { code, msg } = rslt.data;
+      const { code, msg, AESencode } = rslt.data;
       if (code === '-1') {
         throw new Error(msg);
       }
+
+      if (AESencode) {
+        const fmdata = this.crypto.ecbdecrypt(rslt.data.AESencode.replace(/\s/g, ''));
+        if (fmdata) {
+          rslt.data = JSON.parse(fmdata);
+        }
+      }
     }
+
     return rslt;
   }
 
@@ -256,7 +277,7 @@ class AttackNumber {
       url: 'http://211.136.111.153:8080/MOP_ac/PadcrmSocialOpenAccountService?action=queryNumber',
       data: { ...filerParams },
       // 创建连接超时 5 秒，接收响应超时 30 秒，用于响应比较大的场景
-      timeout: [5000, 50000],
+      timeout: [ 5000, 50000 ],
       // dataType: 'text',
       headers: {
         Accept: 'application/json, text/plain, */*',
